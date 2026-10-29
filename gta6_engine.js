@@ -256,11 +256,11 @@ class Gta6AnimationEngine {
     const baseImg = isStJoseph ? this.assets.stJosephBase : this.assets.viBase;
 
     // Vertical shadow wipe parameters:
-    // St. Joseph text spans y: 330 to 760
+    // St. Joseph text spans y: 363 to 717
     // VI numeral spans y: 340 to 870
-    const wipeYStartMin = isStJoseph ? 300 : 340;
-    const wipeYStartMax = isStJoseph ? 770 : 870;
-    const wipeGradHeight = isStJoseph ? 90 : 110;
+    const wipeYStartMin = isStJoseph ? 330 : 340;
+    const wipeYStartMax = isStJoseph ? 720 : 870;
+    const wipeGradHeight = isStJoseph ? 85 : 110;
 
     // PHASE 2 & 3: GLOW SCIENCE (0.30s <= t < 4.10s)
     const glowAlpha = this.getGlowIntensity(t);
