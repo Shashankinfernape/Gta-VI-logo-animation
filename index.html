@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GTA VI Logo Animation - Pure Roman Numeral VI</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="logo-tag">
+      <div class="logo-badge">VI PURE</div>
+      <div class="title-area">
+        <h1>ROMAN NUMERAL "VI" RECONSTRUCTION</h1>
+        <p>Unobstructed Palm Sunset &bull; Exact Downward Shadow Wipe &bull; Complete Glow Science &bull; 60 FPS</p>
+      </div>
+    </div>
+
+    <!-- View Mode Switcher -->
+    <div class="view-mode-tabs">
+      <button class="tab-btn active" data-mode="single">Pure VI Engine</button>
+      <button class="tab-btn" data-mode="split">Side-by-Side (MP4 vs Code)</button>
+      <button class="tab-btn" data-mode="diff">Diff / Parity Check</button>
+    </div>
+  </header>
+
+  <!-- Stage Container -->
+  <main class="stage-container view-single" id="stageContainer">
+    <div class="viewport-wrapper">
+      
+      <!-- Original Video Container -->
+      <div id="sourceVideoContainer">
+        <span class="screen-label badge-mp4"><span class="status-dot"></span> Original MP4</span>
+        <video id="sourceVideo" src="logo.mp4" playsinline muted></video>
+      </div>
+
+      <!-- Generated Code Canvas Container -->
+      <div id="canvasContainer">
+        <span class="screen-label badge-code"><span class="status-dot"></span> Pure VI Engine</span>
+        <canvas id="gtaCanvas"></canvas>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Audio Element -->
+  <audio id="soundtrack" src="audio.mp3" preload="auto"></audio>
+
+  <!-- Control Deck -->
+  <section class="control-deck">
+    
+    <!-- Timeline Scrubber -->
+    <div class="timeline-row">
+      <div class="time-display" id="timeDisplay">0.00s / 9.10s</div>
+      <div class="scrubber-container">
+        <input type="range" class="timeline-scrubber" id="scrubber" min="0" max="9.10" step="0.01" value="0">
+      </div>
+      <div class="time-display" id="frameDisplay" style="color: var(--accent-cyan); min-width: 110px;">Frame 0 / 273</div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="buttons-row">
+      
+      <!-- Transport controls -->
+      <div class="btn-group">
+        <button class="ctrl-btn primary" id="playBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span id="playBtnText">Play</span>
+        </button>
+
+        <button class="ctrl-btn" id="stepBackBtn" title="Step Back 1 Frame (1/30s)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11 19V5l-9 7 9 7zm8-14l-9 7 9 7V5z"/></svg>
+          -1 Frame
+        </button>
+
+        <button class="ctrl-btn" id="stepFwdBtn" title="Step Forward 1 Frame (1/30s)">
+          +1 Frame
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5 5v14l9-7-9-7zm8 0v14l9-7-9-7z"/></svg>
+        </button>
+
+        <button class="ctrl-btn" id="restartBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+          Restart
+        </button>
+      </div>
+
+      <!-- VI Focus & Text Overlay Toggle -->
+      <div class="btn-group">
+        <button class="ctrl-btn" id="toggleTextBtn" style="border-color: var(--accent-orange); color: #ffbe76;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span id="toggleTextLabel">Focus: Pure VI Only</span>
+        </button>
+      </div>
+
+      <!-- Playback Speed -->
+      <div class="btn-group">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Speed:</span>
+        <div class="speed-selector">
+          <button class="speed-btn" data-speed="0.25">0.25x</button>
+          <button class="speed-btn" data-speed="0.5">0.5x</button>
+          <button class="speed-btn active" data-speed="1.0">1.0x</button>
+          <button class="speed-btn" data-speed="2.0">2.0x</button>
+        </div>
+      </div>
+
+      <!-- Sound & Fullscreen -->
+      <div class="btn-group">
+        <button class="ctrl-btn" id="audioToggleBtn">
+          <svg id="audioIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <span id="audioText">Audio: On</span>
+        </button>
+        <button class="ctrl-btn" id="fullscreenBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          Fullscreen
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Accuracy & Milestone Information -->
+  <section class="diag-grid">
+    
+    <!-- Timeline Milestones -->
+    <div class="card">
+      <h3>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-pink)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        VI Animation Milestones
+      </h3>
+      <div class="milestone-list">
+        <div class="milestone-item" id="m0" onclick="engine.seek(0.0)">
+          <span>Phase 1: Pitch Black Void</span>
+          <span class="milestone-time">0.00s - 0.30s</span>
+        </div>
+        <div class="milestone-item" id="m1" onclick="engine.seek(0.6)">
+          <span>Phase 2: Neon Outline Top-Down Shadow Wipe</span>
+          <span class="milestone-time">0.30s - 1.40s</span>
+        </div>
+        <div class="milestone-item" id="m2" onclick="engine.seek(2.0)">
+          <span>Phase 3: Peak Glow Plateau & Miami Sunset Palms Fill</span>
+          <span class="milestone-time">1.40s - 2.70s</span>
+        </div>
+        <div class="milestone-item" id="m3" onclick="engine.seek(3.3)">
+          <span>Phase 4: Glow-Out Phase (S-Curve Dissipation)</span>
+          <span class="milestone-time">2.70s - 4.10s</span>
+        </div>
+        <div class="milestone-item" id="m4" onclick="engine.seek(5.5)">
+          <span>Phase 5: Unobstructed VI Master Lockup</span>
+          <span class="milestone-time">4.10s - 9.10s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Precision Engine Specs -->
+    <div class="card">
+      <h3>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        VI Technical Specifications
+      </h3>
+      <div class="stat-row">
+        <span class="stat-label">Framing Target:</span>
+        <span class="stat-val accent">Roman Numeral "VI" (100% Unobstructed)</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Shadow Wipe Coordinates:</span>
+        <span class="stat-val">y=340px &rarr; y=870px (110px soft gradient)</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Glow Science Curve:</span>
+        <span class="stat-val">Ramp &rarr; Plateau &rarr; Cosine Glow-Out &rarr; Stop (4.10s)</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Double-Border Definition:</span>
+        <span class="stat-val">Outer Purple (#5e0d7c) &bull; Inner Amber (#fca311)</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Background State at Lockup:</span>
+        <span class="stat-val accent">100% Pure Pitch Black (#000000)</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Framerate & Audio:</span>
+        <span class="stat-val">60 FPS Hardware VSync &bull; 48kHz Stereo Sync</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Load Engine -->
+  <script src="gta6_engine.js"></script>
+  <script>
+    // Initialize Animation Engine
+    const engine = new Gta6AnimationEngine('gtaCanvas', 'soundtrack', 'sourceVideo');
+
+    // UI Elements
+    const playBtn = document.getElementById('playBtn');
+    const playBtnText = document.getElementById('playBtnText');
+    const scrubber = document.getElementById('scrubber');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const frameDisplay = document.getElementById('frameDisplay');
+    const restartBtn = document.getElementById('restartBtn');
+    const stepBackBtn = document.getElementById('stepBackBtn');
+    const stepFwdBtn = document.getElementById('stepFwdBtn');
+    const audioToggleBtn = document.getElementById('audioToggleBtn');
+    const audioText = document.getElementById('audioText');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const stageContainer = document.getElementById('stageContainer');
+    const toggleTextBtn = document.getElementById('toggleTextBtn');
+    const toggleTextLabel = document.getElementById('toggleTextLabel');
+
+    // Text Overlay Toggle
+    let textOverlayEnabled = false;
+    toggleTextBtn.addEventListener('click', () => {
+      textOverlayEnabled = !textOverlayEnabled;
+      engine.setShowGtaText(textOverlayEnabled);
+      toggleTextLabel.textContent = textOverlayEnabled ? 'Overlay: GTA Text Active' : 'Focus: Pure VI Only';
+      toggleTextBtn.style.borderColor = textOverlayEnabled ? 'var(--accent-pink)' : 'var(--accent-orange)';
+    });
+
+    // View Mode Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mode = btn.dataset.mode;
+        stageContainer.className = 'stage-container view-' + mode;
+      });
+    });
+
+    // Play/Pause button
+    playBtn.addEventListener('click', () => {
+      engine.togglePlay();
+    });
+
+    // Scrubber
+    let isScrubbing = false;
+    scrubber.addEventListener('input', (e) => {
+      isScrubbing = true;
+      engine.seek(parseFloat(e.target.value));
+    });
+    scrubber.addEventListener('change', () => {
+      isScrubbing = false;
+    });
+
+    // Engine Time Updates
+    engine.onTimeUpdate = (currentTime, duration) => {
+      if (!isScrubbing) {
+        scrubber.value = currentTime;
+      }
+      timeDisplay.textContent = currentTime.toFixed(2) + 's / ' + duration.toFixed(2) + 's';
+      const frameNum = Math.min(273, Math.round(currentTime * 30));
+      frameDisplay.textContent = 'Frame ' + frameNum + ' / 273';
+      updateActiveMilestone(currentTime);
+    };
+
+    // Engine State Change
+    engine.onStateChange = (state) => {
+      if (state === 'playing') {
+        playBtnText.textContent = 'Pause';
+        playBtn.querySelector('svg').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+      } else {
+        playBtnText.textContent = 'Play';
+        playBtn.querySelector('svg').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+      }
+    };
+
+    // Step frames (1/30s)
+    stepBackBtn.addEventListener('click', () => {
+      engine.pause();
+      engine.seek(engine.currentTime - (1 / 30));
+    });
+    stepFwdBtn.addEventListener('click', () => {
+      engine.pause();
+      engine.seek(engine.currentTime + (1 / 30));
+    });
+
+    // Restart
+    restartBtn.addEventListener('click', () => {
+      engine.seek(0);
+      engine.play();
+    });
+
+    // Playback Speed
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        engine.setSpeed(parseFloat(btn.dataset.speed));
+      });
+    });
+
+    // Audio Toggle
+    let audioMuted = false;
+    audioToggleBtn.addEventListener('click', () => {
+      audioMuted = !audioMuted;
+      engine.audio.muted = audioMuted;
+      audioText.textContent = audioMuted ? 'Audio: Muted' : 'Audio: On';
+      audioToggleBtn.style.borderColor = audioMuted ? 'rgba(255,255,255,0.1)' : 'var(--accent-pink)';
+    });
+
+    // Fullscreen
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        stageContainer.requestFullscreen().catch(err => alert(err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    // Keyboard Shortcuts (Space: Play/Pause, Left/Right: Frame step)
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        engine.togglePlay();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        engine.pause();
+        engine.seek(engine.currentTime - (1 / 30));
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        engine.pause();
+        engine.seek(engine.currentTime + (1 / 30));
+      }
+    });
+
+    // Milestone active tracker
+    function updateActiveMilestone(t) {
+      const items = [
+        { id: 'm0', start: 0.0, end: 0.30 },
+        { id: 'm1', start: 0.30, end: 1.40 },
+        { id: 'm2', start: 1.40, end: 2.70 },
+        { id: 'm3', start: 2.70, end: 4.10 },
+        { id: 'm4', start: 4.10, end: 9.10 }
+      ];
+
+      items.forEach(item => {
+        const el = document.getElementById(item.id);
+        if (el) {
+          if (t >= item.start && t < item.end) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
