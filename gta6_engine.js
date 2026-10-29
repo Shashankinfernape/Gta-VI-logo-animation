@@ -1,13 +1,15 @@
 /**
  * GTA VI Trailer Logo Reveal - 100% Accurate Source Code Engine
- * Focused exclusively on the iconic Roman Numeral "VI"
+ * Supports:
+ * 1. "ST. JOSEPH ENGLISH HIGH SCHOOL" custom text logo (Active Default)
+ * 2. Original GTA VI Roman Numeral "VI"
  * 
- * Timeline & Glow Science:
- * 1. Pitch Black Void (0.00s - 0.30s)
- * 2. Neon Outline Strike & Downward Shadow Wipe (0.30s - 1.40s)
- * 3. Peak Glow Plateau & Interior Palms Power-On (1.40s - 2.70s)
- * 4. Glow-Out Phase (2.70s - 4.10s) with S-curve cosine decay
- * 5. Complete Glow Stop & Unobstructed VI Master Lockup (4.10s - 9.10s)
+ * Powered by exact Glow Science:
+ * - Phase 1 (0.00s - 0.30s): Pitch Black Void
+ * - Phase 2 (0.30s - 1.40s): Neon Tube Ignition & Downward Shadow Wipe
+ * - Phase 3 (1.40s - 2.70s): Peak Glow Plateau & Sunset Gradient Fill
+ * - Phase 4 (2.70s - 4.10s): Glow-Out Phase (Cosine S-Curve Dissipation)
+ * - Phase 5 (4.10s - 9.10s): Glow Stop Process & Unobstructed Master Lockup
  */
 
 class Gta6AnimationEngine {
@@ -31,19 +33,24 @@ class Gta6AnimationEngine {
     this.lastTimestamp = null;
     this.animationFrameId = null;
 
-    // Mode: Focused exclusively on VI
+    // Active Logo Target: 'st_joseph' by default, or 'vi'
+    this.activeTarget = 'st_joseph';
     this.showGtaText = false;
 
     // Assets container
     this.assets = {
+      // VI Assets
       neonGlow: new Image(),
       viBase: new Image(),
       gtaText: new Image(),
-      coming2025: new Image()
+      coming2025: new Image(),
+      // St. Joseph Assets
+      stJosephNeon: new Image(),
+      stJosephBase: new Image()
     };
 
     this.assetsLoaded = false;
-    this.totalAssets = 4;
+    this.totalAssets = 6;
     this.loadedAssetsCount = 0;
 
     // Callbacks
@@ -60,7 +67,9 @@ class Gta6AnimationEngine {
       neonGlow: 'assets/vi_neon_clean.png',
       viBase: 'assets/vi_full_unobstructed.png',
       gtaText: 'assets/gta_text_logo.png',
-      coming2025: 'assets/coming_2025_clean.png'
+      coming2025: 'assets/coming_2025_clean.png',
+      stJosephNeon: 'assets/st_joseph_neon.png',
+      stJosephBase: 'assets/st_joseph_base.png'
     };
 
     for (const [key, src] of Object.entries(assetSources)) {
@@ -81,6 +90,16 @@ class Gta6AnimationEngine {
       this.audio.src = 'audio.mp3';
       this.audio.preload = 'auto';
     }
+  }
+
+  setTarget(targetName) {
+    this.activeTarget = targetName;
+    this.renderFrame(this.currentTime);
+  }
+
+  setShowGtaText(show) {
+    this.showGtaText = show;
+    this.renderFrame(this.currentTime);
   }
 
   play() {
@@ -158,11 +177,6 @@ class Gta6AnimationEngine {
     if (this.sourceVideo) this.sourceVideo.playbackRate = rate;
   }
 
-  setShowGtaText(show) {
-    this.showGtaText = show;
-    this.renderFrame(this.currentTime);
-  }
-
   tick(timestamp) {
     if (!this.isPlaying) return;
 
@@ -171,7 +185,7 @@ class Gta6AnimationEngine {
 
     this.currentTime += delta * this.playbackRate;
 
-    // Adjust audio drift
+    // Audio sync drift adjustment
     if (this.audio && !this.audio.paused && Math.abs(this.audio.currentTime - this.currentTime) > 0.15) {
       this.currentTime = this.audio.currentTime;
     }
@@ -194,12 +208,12 @@ class Gta6AnimationEngine {
   }
 
   /**
-   * Glow Science Lifecycle function G(t)
-   * 0.00s <= t < 0.30s: 0.000 (Pure Black Void)
-   * 0.30s <= t < 1.40s: Glow Growth (sinusoidal ramp 0 -> 1)
-   * 1.40s <= t < 2.70s: 1.000 (Peak Glow Plateau)
-   * 2.70s <= t < 4.10s: Glow-Out Phase (cosine decay 1 -> 0)
-   * t >= 4.10s: 0.000 (Stop Process: Complete Glow Termination)
+   * Exact Glow Science Lifecycle function G(t)
+   * - 0.00s <= t < 0.30s: 0.000 (Pure Black Void)
+   * - 0.30s <= t < 1.40s: Glow Growth (sinusoidal ramp 0 -> 1)
+   * - 1.40s <= t < 2.70s: 1.000 (Peak Glow Plateau)
+   * - 2.70s <= t < 4.10s: Glow-Out Phase (cosine S-curve decay 1 -> 0)
+   * - t >= 4.10s: 0.000 (Stop Process: Complete Glow Termination)
    */
   getGlowIntensity(t) {
     if (t < 0.30) {
@@ -218,7 +232,7 @@ class Gta6AnimationEngine {
   }
 
   /**
-   * Main 60fps frame rendering pipeline focused on the Roman Numeral "VI"
+   * Main 60fps frame rendering pipeline
    */
   renderFrame(t) {
     const ctx = this.ctx;
@@ -236,6 +250,18 @@ class Gta6AnimationEngine {
       return;
     }
 
+    // Select active assets based on target
+    const isStJoseph = this.activeTarget === 'st_joseph';
+    const neonImg = isStJoseph ? this.assets.stJosephNeon : this.assets.neonGlow;
+    const baseImg = isStJoseph ? this.assets.stJosephBase : this.assets.viBase;
+
+    // Vertical shadow wipe parameters:
+    // St. Joseph text spans y: 330 to 760
+    // VI numeral spans y: 340 to 870
+    const wipeYStartMin = isStJoseph ? 300 : 340;
+    const wipeYStartMax = isStJoseph ? 770 : 870;
+    const wipeGradHeight = isStJoseph ? 90 : 110;
+
     // PHASE 2 & 3: GLOW SCIENCE (0.30s <= t < 4.10s)
     const glowAlpha = this.getGlowIntensity(t);
 
@@ -243,16 +269,16 @@ class Gta6AnimationEngine {
       ctx.save();
       ctx.globalAlpha = glowAlpha;
 
-      // Draw the neon outline with volumetric god rays
-      ctx.drawImage(this.assets.neonGlow, 0, 0, w, h);
+      // Draw the glowing neon outline with volumetric god rays
+      ctx.drawImage(neonImg, 0, 0, w, h);
 
-      // Downward shadow mask (0.30s <= t < 1.65s)
-      if (t < 1.65) {
-        const p = Math.max(0, Math.min(1.0, (t - 0.30) / (1.65 - 0.30)));
-        const yStart = 340 + p * 530; // 340px down to 870px
-        const yEnd = yStart + 110;    // 450px down to 980px
+      // Downward shadow mask (0.30s <= t < 1.40s)
+      if (t < 1.40) {
+        const p = Math.max(0, Math.min(1.0, (t - 0.30) / (1.40 - 0.30)));
+        const yStart = wipeYStartMin + p * (wipeYStartMax - wipeYStartMin);
+        const yEnd = yStart + wipeGradHeight;
 
-        // Soft shadow gradient cutoff
+        // Soft shadow gradient cutoff into darkness
         const shadowGrad = ctx.createLinearGradient(0, yStart, 0, yEnd);
         shadowGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
         shadowGrad.addColorStop(0.35, 'rgba(0, 0, 0, 0.45)');
@@ -262,7 +288,7 @@ class Gta6AnimationEngine {
         ctx.fillStyle = shadowGrad;
         ctx.fillRect(0, yStart, w, yEnd - yStart);
 
-        // Pitch black below yEnd
+        // Solid pitch black below yEnd
         if (yEnd < h) {
           ctx.fillStyle = '#000000';
           ctx.fillRect(0, yEnd, w, h - yEnd);
@@ -271,19 +297,18 @@ class Gta6AnimationEngine {
       ctx.restore();
     }
 
-    // PHASE 3 & 4 & 5: Interior Sunset Gradient & Silhouetted Palm Trees (t >= 1.70s)
-    // Renders the full, unobstructed VI emblem with zero text interference
+    // PHASE 3 & 4 & 5: Interior Sunset Gradient & Tropical Palms (t >= 1.70s)
     if (t >= 1.70) {
       const p = Math.min(1.0, (t - 1.70) / 1.50); // fades in from 1.70s to 3.20s
-      const viAlpha = p * p * (3 - 2 * p); // smoothstep
+      const baseAlpha = p * p * (3 - 2 * p); // smoothstep
       ctx.save();
-      ctx.globalAlpha = viAlpha;
-      ctx.drawImage(this.assets.viBase, 0, 0, w, h);
+      ctx.globalAlpha = baseAlpha;
+      ctx.drawImage(baseImg, 0, 0, w, h);
       ctx.restore();
     }
 
-    // OPTIONAL: GTA Text & Subtitle Reveal (only if user explicitly enables toggle)
-    if (this.showGtaText) {
+    // Optional text overlay (for VI mode only, if user toggles on)
+    if (!isStJoseph && this.showGtaText) {
       if (t >= 3.80) {
         const scanStart = 3.80;
         const scanEnd = 5.75;
@@ -307,28 +332,13 @@ class Gta6AnimationEngine {
           ctx.save();
           ctx.drawImage(this.assets.gtaText, 0, 0, w, h);
           ctx.restore();
-
-          if (t >= 5.75 && t < 5.90) {
-            const flareP = 1.0 - (t - 5.75) / 0.15;
-            ctx.save();
-            ctx.globalCompositeOperation = 'lighter';
-            ctx.globalAlpha = flareP * 0.35;
-            ctx.fillStyle = '#ff7ef0';
-            ctx.fillRect(660, 260, 660, 460);
-            ctx.restore();
-          }
         }
       }
 
       if (t >= 6.05) {
-        let comingAlpha = 0;
-        if (t >= 6.05 && t < 6.35) {
-          comingAlpha = (t - 6.05) / 0.30;
-        } else {
-          comingAlpha = 1.0;
-        }
+        let comingAlpha = Math.min(1.0, (t - 6.05) / 0.30);
         ctx.save();
-        ctx.globalAlpha = Math.min(1.0, comingAlpha);
+        ctx.globalAlpha = comingAlpha;
         ctx.drawImage(this.assets.coming2025, 0, 0, w, h);
         ctx.restore();
       }

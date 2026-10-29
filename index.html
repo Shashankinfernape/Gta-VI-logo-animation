@@ -3,26 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GTA VI Logo Animation - Pure Roman Numeral VI</title>
+  <title>GTA VI Animation Engine — St. Joseph English High School</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .target-switcher {
+      display: flex;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .target-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .target-btn:hover {
+      color: #fff;
+    }
+    .target-btn.active {
+      background: linear-gradient(135deg, #ec1c87, #ff7e33);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(236, 28, 135, 0.5);
+    }
+  </style>
 </head>
 <body>
 
   <!-- App Header -->
   <header class="app-header">
     <div class="logo-tag">
-      <div class="logo-badge">VI PURE</div>
+      <div class="logo-badge" id="badgeLabel">ST. JOSEPH</div>
       <div class="title-area">
-        <h1>ROMAN NUMERAL "VI" RECONSTRUCTION</h1>
-        <p>Unobstructed Palm Sunset &bull; Exact Downward Shadow Wipe &bull; Complete Glow Science &bull; 60 FPS</p>
+        <h1 id="headerTitle">ST. JOSEPH ENGLISH HIGH SCHOOL</h1>
+        <p>100% Accurate VI Glow Science &bull; Downward Shadow Wipe &bull; Sunset & Palms &bull; 60 FPS</p>
       </div>
     </div>
 
-    <!-- View Mode Switcher -->
-    <div class="view-mode-tabs">
-      <button class="tab-btn active" data-mode="single">Pure VI Engine</button>
-      <button class="tab-btn" data-mode="split">Side-by-Side (MP4 vs Code)</button>
-      <button class="tab-btn" data-mode="diff">Diff / Parity Check</button>
+    <!-- Target & View Mode Switchers -->
+    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+      <div class="target-switcher">
+        <button class="target-btn active" data-target="st_joseph">St. Joseph High School</button>
+        <button class="target-btn" data-target="vi">GTA VI Numeral</button>
+      </div>
+
+      <div class="view-mode-tabs">
+        <button class="tab-btn active" data-mode="single">Canvas Engine</button>
+        <button class="tab-btn" data-mode="split">Side-by-Side (MP4 vs Code)</button>
+        <button class="tab-btn" data-mode="diff">Diff Check</button>
+      </div>
     </div>
   </header>
 
@@ -32,13 +68,13 @@
       
       <!-- Original Video Container -->
       <div id="sourceVideoContainer">
-        <span class="screen-label badge-mp4"><span class="status-dot"></span> Original MP4</span>
+        <span class="screen-label badge-mp4"><span class="status-dot"></span> Reference MP4</span>
         <video id="sourceVideo" src="logo.mp4" playsinline muted></video>
       </div>
 
       <!-- Generated Code Canvas Container -->
       <div id="canvasContainer">
-        <span class="screen-label badge-code"><span class="status-dot"></span> Pure VI Engine</span>
+        <span class="screen-label badge-code" id="canvasBadge"><span class="status-dot"></span> St. Joseph Neon Engine</span>
         <canvas id="gtaCanvas"></canvas>
       </div>
 
@@ -86,14 +122,6 @@
         </button>
       </div>
 
-      <!-- VI Focus & Text Overlay Toggle -->
-      <div class="btn-group">
-        <button class="ctrl-btn" id="toggleTextBtn" style="border-color: var(--accent-orange); color: #ffbe76;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          <span id="toggleTextLabel">Focus: Pure VI Only</span>
-        </button>
-      </div>
-
       <!-- Playback Speed -->
       <div class="btn-group">
         <span style="font-size: 0.8rem; color: var(--text-muted);">Speed:</span>
@@ -127,7 +155,7 @@
     <div class="card">
       <h3>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-pink)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        VI Animation Milestones
+        Animation Glow Milestones
       </h3>
       <div class="milestone-list">
         <div class="milestone-item" id="m0" onclick="engine.seek(0.0)">
@@ -139,7 +167,7 @@
           <span class="milestone-time">0.30s - 1.40s</span>
         </div>
         <div class="milestone-item" id="m2" onclick="engine.seek(2.0)">
-          <span>Phase 3: Peak Glow Plateau & Miami Sunset Palms Fill</span>
+          <span>Phase 3: Peak Glow Plateau & Sunset Palms Fill</span>
           <span class="milestone-time">1.40s - 2.70s</span>
         </div>
         <div class="milestone-item" id="m3" onclick="engine.seek(3.3)">
@@ -147,7 +175,7 @@
           <span class="milestone-time">2.70s - 4.10s</span>
         </div>
         <div class="milestone-item" id="m4" onclick="engine.seek(5.5)">
-          <span>Phase 5: Unobstructed VI Master Lockup</span>
+          <span>Phase 5: Master Lockup (Glow Stopped, Pitch Black)</span>
           <span class="milestone-time">4.10s - 9.10s</span>
         </div>
       </div>
@@ -157,31 +185,31 @@
     <div class="card">
       <h3>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        VI Technical Specifications
+        Glow Science & Rendering Specs
       </h3>
       <div class="stat-row">
-        <span class="stat-label">Framing Target:</span>
-        <span class="stat-val accent">Roman Numeral "VI" (100% Unobstructed)</span>
+        <span class="stat-label">Active Logo:</span>
+        <span class="stat-val accent" id="statActive">St. Joseph English High School</span>
       </div>
       <div class="stat-row">
-        <span class="stat-label">Shadow Wipe Coordinates:</span>
-        <span class="stat-val">y=340px &rarr; y=870px (110px soft gradient)</span>
+        <span class="stat-label">Glow Science Model:</span>
+        <span class="stat-val">Sin Ramp &rarr; Plateau &rarr; Cosine Glow-Out &rarr; Stop (4.10s)</span>
       </div>
       <div class="stat-row">
-        <span class="stat-label">Glow Science Curve:</span>
-        <span class="stat-val">Ramp &rarr; Plateau &rarr; Cosine Glow-Out &rarr; Stop (4.10s)</span>
+        <span class="stat-label">Shadow Wipe Geometry:</span>
+        <span class="stat-val">y=300px &rarr; y=770px (Top-to-Bottom darkness roll)</span>
       </div>
       <div class="stat-row">
-        <span class="stat-label">Double-Border Definition:</span>
-        <span class="stat-val">Outer Purple (#5e0d7c) &bull; Inner Amber (#fca311)</span>
+        <span class="stat-label">Interior Fill:</span>
+        <span class="stat-val">Miami Sunset (Indigo/Fuchsia/Amber) + Tropical Palms</span>
       </div>
       <div class="stat-row">
-        <span class="stat-label">Background State at Lockup:</span>
+        <span class="stat-label">Lockup Background:</span>
         <span class="stat-val accent">100% Pure Pitch Black (#000000)</span>
       </div>
       <div class="stat-row">
-        <span class="stat-label">Framerate & Audio:</span>
-        <span class="stat-val">60 FPS Hardware VSync &bull; 48kHz Stereo Sync</span>
+        <span class="stat-label">Audio & VSync:</span>
+        <span class="stat-val">60 FPS Hardware Render &bull; 48kHz Stereo Sync</span>
       </div>
     </div>
 
@@ -206,16 +234,31 @@
     const audioText = document.getElementById('audioText');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     const stageContainer = document.getElementById('stageContainer');
-    const toggleTextBtn = document.getElementById('toggleTextBtn');
-    const toggleTextLabel = document.getElementById('toggleTextLabel');
+    const headerTitle = document.getElementById('headerTitle');
+    const badgeLabel = document.getElementById('badgeLabel');
+    const canvasBadge = document.getElementById('canvasBadge');
+    const statActive = document.getElementById('statActive');
 
-    // Text Overlay Toggle
-    let textOverlayEnabled = false;
-    toggleTextBtn.addEventListener('click', () => {
-      textOverlayEnabled = !textOverlayEnabled;
-      engine.setShowGtaText(textOverlayEnabled);
-      toggleTextLabel.textContent = textOverlayEnabled ? 'Overlay: GTA Text Active' : 'Focus: Pure VI Only';
-      toggleTextBtn.style.borderColor = textOverlayEnabled ? 'var(--accent-pink)' : 'var(--accent-orange)';
+    // Target Switcher (St. Joseph vs GTA VI)
+    document.querySelectorAll('.target-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.target;
+        engine.setTarget(target);
+
+        if (target === 'st_joseph') {
+          headerTitle.textContent = 'ST. JOSEPH ENGLISH HIGH SCHOOL';
+          badgeLabel.textContent = 'ST. JOSEPH';
+          canvasBadge.innerHTML = '<span class="status-dot"></span> St. Joseph Neon Engine';
+          statActive.textContent = 'St. Joseph English High School';
+        } else {
+          headerTitle.textContent = 'ROMAN NUMERAL "VI"';
+          badgeLabel.textContent = 'VI PURE';
+          canvasBadge.innerHTML = '<span class="status-dot"></span> GTA VI Neon Engine';
+          statActive.textContent = 'GTA VI Roman Numeral';
+        }
+      });
     });
 
     // View Mode Tabs
