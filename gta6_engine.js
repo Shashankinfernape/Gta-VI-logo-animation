@@ -220,11 +220,10 @@ class Gta6AnimationEngine {
     }
 
     if (isStJoseph) {
-      // Cinematic slow glow build-up across 0.30s -> 2.50s
+      // Glow starts from 0.000 at t = 0.30s, smoothly increases to 1.000 at t = 2.50s
       if (t < 2.50) {
         const p = (t - 0.30) / (2.50 - 0.30);
-        const pEase = p * p * (3.0 - 2.0 * p);
-        return 0.65 + 0.35 * pEase;
+        return Math.sin(p * Math.PI * 0.5);
       } else if (t < 3.30) {
         return 1.0;
       } else if (t < 4.70) {
