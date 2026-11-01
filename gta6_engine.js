@@ -46,11 +46,12 @@ class Gta6AnimationEngine {
       coming2025: new Image(),
       // St. Joseph Assets
       stJosephNeon: new Image(),
+      stJosephTight: new Image(),
       stJosephBase: new Image()
     };
 
     this.assetsLoaded = false;
-    this.totalAssets = 6;
+    this.totalAssets = 7;
     this.loadedAssetsCount = 0;
 
     // Callbacks
@@ -69,6 +70,7 @@ class Gta6AnimationEngine {
       gtaText: 'assets/gta_text_logo.png',
       coming2025: 'assets/coming_2025_clean.png',
       stJosephNeon: 'assets/st_joseph_neon.png',
+      stJosephTight: 'assets/st_joseph_tight.png',
       stJosephBase: 'assets/st_joseph_base.png'
     };
 
@@ -208,43 +210,63 @@ class Gta6AnimationEngine {
   }
 
   /**
-   * Cinematic Glow Science Lifecycle function G(t)
-   * St. Joseph: Cinematic Slow Reveal across 0.30s - 2.50s (2.2s duration)
-   * VI: Original Trailer Timing across 0.30s - 1.65s
+   * St. Joseph Tight Neon Core Intensity (crisp 9px tube halo)
+   * Starts immediately at reveal wavefront with tight, lesser glow
    */
-  getGlowIntensity(t) {
-    const isStJoseph = this.activeTarget === 'st_joseph';
-
+  getStJosephTightGlow(t) {
     if (t < 0.30) {
       return 0.0;
-    }
-
-    if (isStJoseph) {
-      // Glow starts from 0.000 at t = 0.30s, smoothly increases to 1.000 at t = 2.50s
-      if (t < 2.50) {
-        const p = (t - 0.30) / (2.50 - 0.30);
-        return Math.sin(p * Math.PI * 0.5);
-      } else if (t < 3.30) {
-        return 1.0;
-      } else if (t < 4.70) {
-        const p = (t - 3.30) / (4.70 - 3.30);
-        return 0.5 * (1 + Math.cos(p * Math.PI));
-      } else {
-        return 0.0;
-      }
+    } else if (t < 2.50) {
+      const p = (t - 0.30) / (2.50 - 0.30);
+      const pEase = p * p * (3.0 - 2.0 * p);
+      return 0.85 + 0.15 * pEase;
+    } else if (t < 3.30) {
+      return 1.0;
+    } else if (t < 4.70) {
+      const p = (t - 3.30) / (4.70 - 3.30);
+      return 0.5 * (1 + Math.cos(p * Math.PI));
     } else {
-      // Original VI trailer curve
-      if (t < 1.40) {
-        const p = (t - 0.30) / (1.40 - 0.30);
-        return Math.sin(p * Math.PI * 0.5);
-      } else if (t < 2.70) {
-        return 1.0;
-      } else if (t < 4.10) {
-        const p = (t - 2.70) / (4.10 - 2.70);
-        return 0.5 * (1 + Math.cos(p * Math.PI));
-      } else {
-        return 0.0;
-      }
+      return 0.0;
+    }
+  }
+
+  /**
+   * St. Joseph Volumetric Bloom Intensity (wide atmospheric god rays & sunset aura)
+   * Starts from 0.000 and BLOOMS OUTWARD along with the downward reveal
+   */
+  getStJosephBloomGlow(t) {
+    if (t < 0.30) {
+      return 0.0;
+    } else if (t < 2.50) {
+      const p = (t - 0.30) / (2.50 - 0.30);
+      const pEase = p * p * (3.0 - 2.0 * p);
+      return pEase * pEase; // Blooms outward smoothly from 0.000 -> 1.000!
+    } else if (t < 3.30) {
+      return 1.0;
+    } else if (t < 4.70) {
+      const p = (t - 3.30) / (4.70 - 3.30);
+      return 0.5 * (1 + Math.cos(p * Math.PI));
+    } else {
+      return 0.0;
+    }
+  }
+
+  /**
+   * Exact Glow Science Lifecycle function G(t) for original VI target
+   */
+  getGlowIntensity(t) {
+    if (t < 0.30) {
+      return 0.0;
+    } else if (t < 1.40) {
+      const p = (t - 0.30) / (1.40 - 0.30);
+      return Math.sin(p * Math.PI * 0.5);
+    } else if (t < 2.70) {
+      return 1.0;
+    } else if (t < 4.10) {
+      const p = (t - 2.70) / (4.10 - 2.70);
+      return 0.5 * (1 + Math.cos(p * Math.PI));
+    } else {
+      return 0.0;
     }
   }
 
@@ -269,7 +291,6 @@ class Gta6AnimationEngine {
 
     // Select active assets based on target
     const isStJoseph = this.activeTarget === 'st_joseph';
-    const neonImg = isStJoseph ? this.assets.stJosephNeon : this.assets.neonGlow;
     const baseImg = isStJoseph ? this.assets.stJosephBase : this.assets.viBase;
 
     // Vertical sweep parameters:
@@ -278,30 +299,39 @@ class Gta6AnimationEngine {
     const yStartMin = isStJoseph ? 305 : 340;
     const yDistance = isStJoseph ? 495 : 530;
     const wipeGradHeight = isStJoseph ? 130 : 110;
-    const revealEndTime = isStJoseph ? 2.50 : 1.65; // Slow cinematic 2.2s reveal for St. Joseph!
+    const revealEndTime = isStJoseph ? 2.50 : 1.65;
 
-    // PHASE 2 & 3: GLOW SCIENCE
-    const glowAlpha = this.getGlowIntensity(t);
+    // PHASE 2 & 3: GLOW SCIENCE & REVEAL
+    if (isStJoseph) {
+      const tightAlpha = this.getStJosephTightGlow(t);
+      const bloomAlpha = this.getStJosephBloomGlow(t);
 
-    if (glowAlpha > 0.001) {
-      ctx.save();
-      ctx.globalAlpha = glowAlpha;
-      // Draw the neon outline with volumetric god rays
-      ctx.drawImage(neonImg, 0, 0, w, h);
-      ctx.restore();
+      // Step 1: Draw the tight neon stroke (lesser glow, crisp 9px core halo)
+      if (tightAlpha > 0.001) {
+        ctx.save();
+        ctx.globalAlpha = tightAlpha;
+        ctx.drawImage(this.assets.stJosephTight, 0, 0, w, h);
+        ctx.restore();
+      }
 
-      // Downward shadow mask (0.30s <= t < revealEndTime)
-      // Runs with globalAlpha = 1.0 so unrevealed underlying font is 100% pitch black
+      // Step 2: Draw the blooming volumetric atmospheric haze & god rays
+      // Starts from 0.000 and blooms along with the reveal!
+      if (bloomAlpha > 0.001) {
+        ctx.save();
+        ctx.globalAlpha = bloomAlpha;
+        ctx.drawImage(this.assets.stJosephNeon, 0, 0, w, h);
+        ctx.restore();
+      }
+
+      // Step 3: Downward shadow mask (0.30s <= t < revealEndTime)
       if (t < revealEndTime) {
         ctx.save();
         ctx.globalAlpha = 1.0;
         const p = Math.max(0, Math.min(1.0, (t - 0.30) / (revealEndTime - 0.30)));
-        // Smooth cinematic ease (smoothstep)
         const pEase = p * p * (3.0 - 2.0 * p);
         const yStart = yStartMin + pEase * yDistance;
         const yEnd = yStart + wipeGradHeight;
 
-        // Luxurious deep shadow gradient cutoff
         const shadowGrad = ctx.createLinearGradient(0, yStart, 0, yEnd);
         shadowGrad.addColorStop(0.00, 'rgba(0, 0, 0, 0)');
         shadowGrad.addColorStop(0.25, 'rgba(0, 0, 0, 0.20)');
@@ -312,12 +342,45 @@ class Gta6AnimationEngine {
         ctx.fillStyle = shadowGrad;
         ctx.fillRect(0, yStart, w, yEnd - yStart);
 
-        // 100% Solid Pitch black below yEnd (Zero bleed-through)
         if (yEnd < h) {
           ctx.fillStyle = '#000000';
           ctx.fillRect(0, yEnd, w, h - yEnd);
         }
         ctx.restore();
+      }
+    } else {
+      // VI NUMERAL PIPELINE
+      const glowAlpha = this.getGlowIntensity(t);
+
+      if (glowAlpha > 0.001) {
+        ctx.save();
+        ctx.globalAlpha = glowAlpha;
+        ctx.drawImage(this.assets.neonGlow, 0, 0, w, h);
+        ctx.restore();
+
+        if (t < revealEndTime) {
+          ctx.save();
+          ctx.globalAlpha = 1.0;
+          const p = Math.max(0, Math.min(1.0, (t - 0.30) / (revealEndTime - 0.30)));
+          const pEase = p * p * (3.0 - 2.0 * p);
+          const yStart = yStartMin + pEase * yDistance;
+          const yEnd = yStart + wipeGradHeight;
+
+          const shadowGrad = ctx.createLinearGradient(0, yStart, 0, yEnd);
+          shadowGrad.addColorStop(0.00, 'rgba(0, 0, 0, 0)');
+          shadowGrad.addColorStop(0.35, 'rgba(0, 0, 0, 0.45)');
+          shadowGrad.addColorStop(0.75, 'rgba(0, 0, 0, 0.92)');
+          shadowGrad.addColorStop(1.00, 'rgba(0, 0, 0, 1.0)');
+
+          ctx.fillStyle = shadowGrad;
+          ctx.fillRect(0, yStart, w, yEnd - yStart);
+
+          if (yEnd < h) {
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, yEnd, w, h - yEnd);
+          }
+          ctx.restore();
+        }
       }
     }
 
