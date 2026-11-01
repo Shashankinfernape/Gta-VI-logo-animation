@@ -208,26 +208,44 @@ class Gta6AnimationEngine {
   }
 
   /**
-   * Exact Glow Science Lifecycle function G(t)
-   * - 0.00s <= t < 0.30s: 0.000 (Pure Black Void)
-   * - 0.30s <= t < 1.40s: Glow Growth (sinusoidal ramp 0 -> 1)
-   * - 1.40s <= t < 2.70s: 1.000 (Peak Glow Plateau)
-   * - 2.70s <= t < 4.10s: Glow-Out Phase (cosine S-curve decay 1 -> 0)
-   * - t >= 4.10s: 0.000 (Stop Process: Complete Glow Termination)
+   * Cinematic Glow Science Lifecycle function G(t)
+   * St. Joseph: Cinematic Slow Reveal across 0.30s - 2.50s (2.2s duration)
+   * VI: Original Trailer Timing across 0.30s - 1.65s
    */
   getGlowIntensity(t) {
+    const isStJoseph = this.activeTarget === 'st_joseph';
+
     if (t < 0.30) {
       return 0.0;
-    } else if (t < 1.40) {
-      const p = (t - 0.30) / (1.40 - 0.30);
-      return Math.sin(p * Math.PI * 0.5);
-    } else if (t < 2.70) {
-      return 1.0;
-    } else if (t < 4.10) {
-      const p = (t - 2.70) / (4.10 - 2.70);
-      return 0.5 * (1 + Math.cos(p * Math.PI));
+    }
+
+    if (isStJoseph) {
+      // Cinematic slow glow build-up across 0.30s -> 2.50s
+      if (t < 2.50) {
+        const p = (t - 0.30) / (2.50 - 0.30);
+        const pEase = p * p * (3.0 - 2.0 * p);
+        return 0.65 + 0.35 * pEase;
+      } else if (t < 3.30) {
+        return 1.0;
+      } else if (t < 4.70) {
+        const p = (t - 3.30) / (4.70 - 3.30);
+        return 0.5 * (1 + Math.cos(p * Math.PI));
+      } else {
+        return 0.0;
+      }
     } else {
-      return 0.0;
+      // Original VI trailer curve
+      if (t < 1.40) {
+        const p = (t - 0.30) / (1.40 - 0.30);
+        return Math.sin(p * Math.PI * 0.5);
+      } else if (t < 2.70) {
+        return 1.0;
+      } else if (t < 4.10) {
+        const p = (t - 2.70) / (4.10 - 2.70);
+        return 0.5 * (1 + Math.cos(p * Math.PI));
+      } else {
+        return 0.0;
+      }
     }
   }
 
@@ -255,51 +273,59 @@ class Gta6AnimationEngine {
     const neonImg = isStJoseph ? this.assets.stJosephNeon : this.assets.neonGlow;
     const baseImg = isStJoseph ? this.assets.stJosephBase : this.assets.viBase;
 
-    // Vertical shadow wipe parameters:
-    // St. Joseph text spans y: 363 to 717
-    // VI numeral spans y: 340 to 870
-    const wipeYStartMin = isStJoseph ? 330 : 340;
-    const wipeYStartMax = isStJoseph ? 720 : 870;
-    const wipeGradHeight = isStJoseph ? 85 : 110;
+    // Vertical sweep parameters:
+    // St. Joseph text: y: 368 to 710, glow reaches 300 to 780
+    // VI numeral: y: 340 to 870
+    const yStartMin = isStJoseph ? 305 : 340;
+    const yDistance = isStJoseph ? 495 : 530;
+    const wipeGradHeight = isStJoseph ? 130 : 110;
+    const revealEndTime = isStJoseph ? 2.50 : 1.65; // Slow cinematic 2.2s reveal for St. Joseph!
 
-    // PHASE 2 & 3: GLOW SCIENCE (0.30s <= t < 4.10s)
+    // PHASE 2 & 3: GLOW SCIENCE
     const glowAlpha = this.getGlowIntensity(t);
 
     if (glowAlpha > 0.001) {
       ctx.save();
       ctx.globalAlpha = glowAlpha;
-
-      // Draw the glowing neon outline with volumetric god rays
+      // Draw the neon outline with volumetric god rays
       ctx.drawImage(neonImg, 0, 0, w, h);
+      ctx.restore();
 
-      // Downward shadow mask (0.30s <= t < 1.40s)
-      if (t < 1.40) {
-        const p = Math.max(0, Math.min(1.0, (t - 0.30) / (1.40 - 0.30)));
-        const yStart = wipeYStartMin + p * (wipeYStartMax - wipeYStartMin);
+      // Downward shadow mask (0.30s <= t < revealEndTime)
+      // Runs with globalAlpha = 1.0 so unrevealed underlying font is 100% pitch black
+      if (t < revealEndTime) {
+        ctx.save();
+        ctx.globalAlpha = 1.0;
+        const p = Math.max(0, Math.min(1.0, (t - 0.30) / (revealEndTime - 0.30)));
+        // Smooth cinematic ease (smoothstep)
+        const pEase = p * p * (3.0 - 2.0 * p);
+        const yStart = yStartMin + pEase * yDistance;
         const yEnd = yStart + wipeGradHeight;
 
-        // Soft shadow gradient cutoff into darkness
+        // Luxurious deep shadow gradient cutoff
         const shadowGrad = ctx.createLinearGradient(0, yStart, 0, yEnd);
-        shadowGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-        shadowGrad.addColorStop(0.35, 'rgba(0, 0, 0, 0.45)');
-        shadowGrad.addColorStop(0.75, 'rgba(0, 0, 0, 0.92)');
-        shadowGrad.addColorStop(1, 'rgba(0, 0, 0, 1)');
+        shadowGrad.addColorStop(0.00, 'rgba(0, 0, 0, 0)');
+        shadowGrad.addColorStop(0.25, 'rgba(0, 0, 0, 0.20)');
+        shadowGrad.addColorStop(0.50, 'rgba(0, 0, 0, 0.55)');
+        shadowGrad.addColorStop(0.75, 'rgba(0, 0, 0, 0.88)');
+        shadowGrad.addColorStop(1.00, 'rgba(0, 0, 0, 1.0)');
 
         ctx.fillStyle = shadowGrad;
         ctx.fillRect(0, yStart, w, yEnd - yStart);
 
-        // Solid pitch black below yEnd
+        // 100% Solid Pitch black below yEnd (Zero bleed-through)
         if (yEnd < h) {
           ctx.fillStyle = '#000000';
           ctx.fillRect(0, yEnd, w, h - yEnd);
         }
+        ctx.restore();
       }
-      ctx.restore();
     }
 
-    // PHASE 3 & 4 & 5: Interior Sunset Gradient & Tropical Palms (t >= 1.70s)
-    if (t >= 1.70) {
-      const p = Math.min(1.0, (t - 1.70) / 1.50); // fades in from 1.70s to 3.20s
+    // PHASE 3 & 4 & 5: Permanent clean base layer (thin white line for St. Joseph, sunset palms for VI)
+    const baseFadeStart = isStJoseph ? 2.30 : 1.70;
+    if (t >= baseFadeStart) {
+      const p = Math.min(1.0, (t - baseFadeStart) / 1.50);
       const baseAlpha = p * p * (3 - 2 * p); // smoothstep
       ctx.save();
       ctx.globalAlpha = baseAlpha;
